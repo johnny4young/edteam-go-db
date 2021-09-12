@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	db   *sql.DB
-	once sync.Once
+	db   *sql.DB   // estructura db gestiona un pool de conexiones activas e inactivas
+	once sync.Once // estructura Once que permite ejecutar una única vez (Singleton)
 )
 
 // NewPostgresDB create a singleton connection
