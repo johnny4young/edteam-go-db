@@ -36,3 +36,12 @@ func NewPostgresDB() {
 func Pool() *sql.DB {
 	return db
 }
+
+// utility to handle null values for string data type
+func stringToNull(s string) sql.NullString {
+	null := sql.NullString{String: s}
+	if null.String != "" {
+		null.Valid = true
+	}
+	return null
+}

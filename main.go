@@ -22,6 +22,16 @@ func main() {
 		log.Fatalf("product.Migrate: %v", err)
 	}
 
+	m := &product.Model{
+		Name:  "OOP GO",
+		Price: 50,
+	}
+	if err := serviceProduct.Create(m); err != nil {
+		log.Fatalf("product.Create: %v", err)
+	}
+
+	fmt.Printf("%+v\n", m)
+
 	storageInvoiceHeader := storage.NewPsqlInvoiceHeader(storage.Pool())
 	serviceInvoiceHeader := invoiceheader.NewService(storageInvoiceHeader)
 

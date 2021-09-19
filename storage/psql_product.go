@@ -3,6 +3,8 @@ package storage
 import (
 	"database/sql"
 	"fmt"
+
+	"github.com/johnny4young/edteam-go-db/pkg/product"
 )
 
 const (
@@ -15,6 +17,8 @@ const (
 		updated_at TIMESTAMP,
 		CONSTRAINT products_id_pk PRIMARY KEY (id)
 	)`
+	psqlCreateProduct = `INSERT INTO products (name, observations, price, created_at)
+	VALUES ($1, $2, $3, $4) RETURNING id`
 )
 
 // PsqlProduct used for working with postgress - product
@@ -40,5 +44,28 @@ func (p *PsqlProduct) Migrate() error {
 		return err
 	}
 	fmt.Println("migrations product done")
+	return nil
+}
+
+// Create and implement the interface product.Storage
+func (p *PsqlProduct) Create(m *product.Model) error {
+	stmt, err := p.db.Prepare(psqlCreateProduct)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(
+		m.Name,
+		stringToNull(m.Observations),
+		m.Price,
+		m.CreateAt,
+	).Scan(&m.ID)
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("created product success")
 	return nil
 }
