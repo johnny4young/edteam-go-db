@@ -53,14 +53,20 @@ func main() {
 	}
 
 	// Update
-	m1 := &product.Model{
-		ID:    200,
-		Name:  "Course GO",
-		Price: 50,
-	}
-	err = serviceProduct.Update(m1)
+	// m1 := &product.Model{
+	// 	ID:    200,
+	// 	Name:  "Course GO",
+	// 	Price: 50,
+	// }
+	// err = serviceProduct.Update(m1)
+	// if err != nil {
+	// 	log.Fatalf("product.Update: %v", err)
+	// }
+
+	// Delete
+	err = serviceProduct.Delete(3)
 	if err != nil {
-		log.Fatalf("product.Update: %v", err)
+		log.Fatalf("product.Delete: %v", err)
 	}
 
 	storageInvoiceHeader := storage.NewPsqlInvoiceHeader(storage.Pool())
