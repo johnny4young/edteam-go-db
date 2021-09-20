@@ -19,6 +19,9 @@ const (
 	)`
 	psqlCreateProduct = `INSERT INTO products (name, observations, price, created_at)
 	VALUES ($1, $2, $3, $4) RETURNING id`
+	psqlGetAllProduct = `SELECT id, name, observations, price, 
+	created_at, updated_at 
+	FROM products`
 )
 
 // PsqlProduct used for working with postgress - product
@@ -59,7 +62,7 @@ func (p *PsqlProduct) Create(m *product.Model) error {
 		m.Name,
 		stringToNull(m.Observations),
 		m.Price,
-		m.CreateAt,
+		m.CreatedAt,
 	).Scan(&m.ID)
 
 	if err != nil {
@@ -68,4 +71,48 @@ func (p *PsqlProduct) Create(m *product.Model) error {
 
 	fmt.Println("created product success")
 	return nil
+}
+
+// Implement the interface product.Storage
+func (p *PsqlProduct) GetAll() (product.Models, error) {
+	stmt, err := p.db.Prepare(psqlGetAllProduct)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ms := make(product.Models, 0)
+	for rows.Next() {
+		m := &product.Model{}
+		observationNull := sql.NullString{}
+		updatedAtNull := sql.NullTime{}
+
+		err := rows.Scan(
+			&m.ID,
+			&m.Name,
+			&observationNull,
+			&m.Price,
+			&m.CreatedAt,
+			&updatedAtNull,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		m.Observations = observationNull.String
+		m.UpdatedAt = updatedAtNull.Time
+		ms = append(ms, m)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return ms, nil
 }

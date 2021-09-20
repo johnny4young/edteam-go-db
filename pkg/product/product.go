@@ -1,6 +1,8 @@
 package product
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -10,19 +12,35 @@ type Model struct {
 	Name         string
 	Observations string
 	Price        int
-	CreateAt     time.Time
+	CreatedAt    time.Time
 	UpdatedAt    time.Time
+}
+
+func (m *Model) String() string {
+	return fmt.Sprintf("%02d | %-20s | %-20s | %5d | %10s | %10s",
+		m.ID, m.Name, m.Observations, m.Price,
+		m.CreatedAt.Format("2006-01-02"), m.UpdatedAt.Format("2006-01-02"))
 }
 
 // Models slice of Model
 type Models []*Model
+
+func (m Models) String() string {
+	builder := strings.Builder{}
+	builder.WriteString(fmt.Sprintf("%02s | %-20s | %-20s | %5s | %10s | %10s\n",
+		"id", "name", "observations", "price", "created_at", "updated_at"))
+	for _, model := range m {
+		builder.WriteString(model.String() + "\n")
+	}
+	return builder.String()
+}
 
 // Storage interface that must implement a db storage
 type Storage interface {
 	Migrate() error
 	Create(*Model) error
 	// Update(*Model) error
-	// GetAll() (Models, error)
+	GetAll() (Models, error)
 	// GetByID(uint) (*Model, error)
 	// Delete(uint) error
 }
@@ -44,6 +62,11 @@ func (s *Service) Migrate() error {
 
 // Create is being used for create a product
 func (s *Service) Create(m *Model) error {
-	m.CreateAt = time.Now()
+	m.CreatedAt = time.Now()
 	return s.storage.Create(m)
+}
+
+// GetAll is used for get all products
+func (s *Service) GetAll() (Models, error) {
+	return s.storage.GetAll()
 }
