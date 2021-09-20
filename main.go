@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -38,8 +40,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("product.GetAll: %v", err)
 	}
-
 	fmt.Println(ms)
+
+	m, err := serviceProduct.GetByID(2)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		log.Println("there is not product found")
+	case err != nil:
+		log.Fatalf(("product.GetByID: %v"), err)
+	default:
+		fmt.Println(m)
+	}
 
 	storageInvoiceHeader := storage.NewPsqlInvoiceHeader(storage.Pool())
 	serviceInvoiceHeader := invoiceheader.NewService(storageInvoiceHeader)
