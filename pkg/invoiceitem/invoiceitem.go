@@ -1,6 +1,7 @@
 package invoiceitem
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -13,9 +14,12 @@ type Model struct {
 	UupdatedAt       time.Time
 }
 
+type Models []*Model
+
 // Storage interface that must implement a db storage
 type Storage interface {
 	Migrate() error
+	CreateTx(*sql.Tx, uint, Models) error
 	// Create(*Model) error
 	// Update(*Model) error
 	// GetAll() (Models, error)
