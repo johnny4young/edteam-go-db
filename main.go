@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/johnny4young/edteam-go-db/pkg/invoice"
 	"github.com/johnny4young/edteam-go-db/pkg/invoiceheader"
 	"github.com/johnny4young/edteam-go-db/pkg/invoiceitem"
 	"github.com/johnny4young/edteam-go-db/pkg/product"
@@ -80,6 +81,26 @@ func main() {
 	serviceInvoiceItem := invoiceitem.NewService(storageInvoiceItem)
 	if err := serviceInvoiceItem.Migrate(); err != nil {
 		log.Fatalf("invoiceItem.Migrate: %v", err)
+	}
+
+	// Transaction
+	storageInvoice := storage.NewPsqlInvoice(
+		storage.Pool(),
+		storageInvoiceHeader,
+		storageInvoiceItem)
+
+	mi := &invoice.Model{
+		Header: &invoiceheader.Model{
+			Client: "Johnny Young",
+		},
+		Items: invoiceitem.Models{
+			&invoiceitem.Model{ProductID: 2},
+			&invoiceitem.Model{ProductID: 1},
+		},
+	}
+	serviceInvoice := invoice.NewService(storageInvoice)
+	if err := serviceInvoice.Create(mi); err != nil {
+		log.Fatalf("invoice.Create: %v", err)
 	}
 
 }
