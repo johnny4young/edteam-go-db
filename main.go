@@ -15,8 +15,14 @@ import (
 )
 
 func main() {
+
 	fmt.Println("it's working")
 
+	//runPostgresOperations()
+	runMySqlOperations()
+}
+
+func runPostgresOperations() {
 	storage.NewPostgresDB()
 	storageProduct := storage.NewPsqlProduct(storage.Pool())
 	serviceProduct := product.NewService(storageProduct)
@@ -102,5 +108,10 @@ func main() {
 	if err := serviceInvoice.Create(mi); err != nil {
 		log.Fatalf("invoice.Create: %v", err)
 	}
+}
 
+func runMySqlOperations() {
+	storage.NewMySQLDB()
+	storage.NewMySQLDB()
+	storage.NewMySQLDB()
 }

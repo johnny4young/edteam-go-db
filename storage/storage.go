@@ -8,6 +8,7 @@ import (
 	"time"
 
 	// only need to register de provider
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 )
 
@@ -30,6 +31,22 @@ func NewPostgresDB() {
 		}
 
 		fmt.Println("connected to postgress")
+	})
+}
+
+func NewMySQLDB() {
+	once.Do(func() {
+		var err error
+		db, err = sql.Open("mysql", "root:example@tcp(localhost:3306)/godb?parseTime=true")
+		if err != nil {
+			log.Fatalf("can't open db: %v", err)
+		}
+
+		if err = db.Ping(); err != nil {
+			log.Fatalf("can't do ping: %v", err)
+		}
+
+		fmt.Println("connected to mySQL")
 	})
 }
 
